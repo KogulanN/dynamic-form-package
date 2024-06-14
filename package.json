@@ -1,6 +1,6 @@
 {
     "name": "dynamic-form-package",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -15,6 +15,9 @@
     "devDependencies": {
       "@types/react": "^17.0.20",
       "@types/react-dom": "^17.0.9"
-    }
+    },
+  "engines": {
+    "node": "18"
+  }
   }
   
