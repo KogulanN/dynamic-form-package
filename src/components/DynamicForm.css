@@ -1,0 +1,102 @@
+/* DynamicForm.css */
+
+/* Base styles */
+body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .section {
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  
+  .column {
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .question {
+    margin-bottom: 10px;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 600px) {
+    .column {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+  
+  @media (min-width: 601px) and (max-width: 900px) {
+    .column {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+  
+  @media (min-width: 901px) {
+    .column {
+      flex: 0 0 33.33%;
+      max-width: 33.33%;
+    }
+  }
+  
+  /* For tabbed layout */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+  
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .tab.active {
+    background-color: #ccc;
+    font-weight: bold;
+  }
+  
+  /* For accordion layout */
+  .accordion {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .accordion-title {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .accordion-content {
+    display: none;
+    padding: 10px;
+  }
+  
+  .accordion-content.active {
+    display: block;
+  }
+  
