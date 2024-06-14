@@ -1,12 +1,53 @@
-//@ts-ignore
-
 import React, { useState } from 'react';
 import './DynamicForm.css';
 
+interface Question {
+  question_id: string;
+  type: string;
+  label?: string;
+  placeholder?: string;
+  options?: { value: string; label: string }[];
+}
+
+interface BusinessRule {
+  question_id: string;
+  required: boolean;
+  validation?: {
+    type: string;
+    minLength?: number;
+    maxLength?: number;
+  };
+}
+
+interface LayoutColumn {
+  column_id: string;
+  questions: string[];
+}
+
+interface LayoutRow {
+  row_id: string;
+  columns: LayoutColumn[];
+}
+
+interface LayoutSection {
+  section_title: string;
+  rows: LayoutRow[];
+}
+
+interface TabLayout {
+  tab_title: string;
+  sections: LayoutSection[];
+}
+
+interface AccordionLayout {
+  accordion_title: string;
+  sections: LayoutSection[];
+}
+
 interface DynamicFormProps {
-  questions: any[];
-  businessRules: any[];
-  layout: any[];
+  questions: Question[];
+  businessRules: BusinessRule[];
+  layout: (LayoutSection | TabLayout | AccordionLayout)[];
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({ questions, businessRules, layout }) => {
@@ -20,17 +61,19 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ questions, businessRules, lay
     return (
       <div key={question.question_id} className="question">
         <label htmlFor={question.question_id}>{question.label}</label>
-        {question.type === 'text' && <input type="text" id={question.question_id} name={question.question_id} placeholder={question.placeholder} />}
+        {question.type === 'text' && (
+          <input type="text" id={question.question_id} name={question.question_id} placeholder={question.placeholder} />
+        )}
         {question.type === 'select' && (
           <select id={question.question_id} name={question.question_id}>
-            {question.options.map(option => (
+            {question.options?.map(option => (
               <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
         )}
         {question.type === 'radio' && (
           <div>
-            {question.options.map(option => (
+            {question.options?.map(option => (
               <label key={option.value}>
                 <input type="radio" name={question.question_id} value={option.value} />
                 {option.label}
@@ -40,7 +83,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ questions, businessRules, lay
         )}
         {question.type === 'checkbox' && (
           <div>
-            {question.options.map(option => (
+            {question.options?.map(option => (
               <label key={option.value}>
                 <input type="checkbox" name={question.question_id} value={option.value} />
                 {option.label}
@@ -55,7 +98,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ questions, businessRules, lay
     );
   };
 
-  const renderSection = (section) => (
+  const renderSection = (section: LayoutSection) => (
     <div key={section.section_title} className="section">
       <h2 className="section-title">{section.section_title}</h2>
       {section.rows.map(row => (
@@ -73,41 +116,51 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ questions, businessRules, lay
   const renderTabs = () => (
     <div>
       <div className="tabs">
-        {layout.map((tab, index) => (
-          <div key={tab.tab_title} className={`tab ${activeTab === index ? 'active' : ''}`} onClick={() => setActiveTab(index)}>
-            {tab.tab_title}
-          </div>
-        ))}
+        {layout.map((tab, index) => {
+          if ((tab as TabLayout).tab_title) {
+            return (
+              <div key={(tab as TabLayout).tab_title} className={`tab ${activeTab === index ? 'active' : ''}`} onClick={() => setActiveTab(index)}>
+                {(tab as TabLayout).tab_title}
+              </div>
+            );
+          }
+          return null;
+        })}
       </div>
       <div className="tab-content">
-        {layout[activeTab].sections.map(section => renderSection(section))}
+        {layout[activeTab] && (layout[activeTab] as TabLayout).sections.map(section => renderSection(section))}
       </div>
     </div>
   );
 
   const renderAccordion = () => (
     <div>
-      {layout.map((accordion, index) => (
-        <div key={accordion.accordion_title} className="accordion">
-          <div className="accordion-title" onClick={() => setActiveAccordion(activeAccordion === index ? null : index)}>
-            {accordion.accordion_title}
-          </div>
-          <div className={`accordion-content ${activeAccordion === index ? 'active' : ''}`}>
-            {accordion.sections.map(section => renderSection(section))}
-          </div>
-        </div>
-      ))}
+      {layout.map((accordion, index) => {
+        if ((accordion as AccordionLayout).accordion_title) {
+          return (
+            <div key={(accordion as AccordionLayout).accordion_title} className="accordion">
+              <div className="accordion-title" onClick={() => setActiveAccordion(activeAccordion === index ? null : index)}>
+                {(accordion as AccordionLayout).accordion_title}
+              </div>
+              <div className={`accordion-content ${activeAccordion === index ? 'active' : ''}`}>
+                {(accordion as AccordionLayout).sections.map(section => renderSection(section))}
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })}
     </div>
   );
 
   const renderForm = () => {
-    if (layout[0]?.tab_title) {
+    if ((layout[0] as TabLayout).tab_title) {
       return renderTabs();
     }
-    if (layout[0]?.accordion_title) {
+    if ((layout[0] as AccordionLayout).accordion_title) {
       return renderAccordion();
     }
-    return layout.map(section => renderSection(section));
+    return layout.map(section => renderSection(section as LayoutSection));
   };
 
   return (
